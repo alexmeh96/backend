@@ -1,9 +1,10 @@
 FROM adoptopenjdk/openjdk11:jdk-11.0.5_10-alpine as builder
-COPY ./ /src
-WORKDIR /src
+RUN apk add git \
+        && git clone https://github.com/alexmeh96/backend.git
+WORKDIR /backend
 RUN ./mvnw -Pprod clean install -DskipTests
 
 FROM adoptopenjdk/openjdk11:alpine-jre
 WORKDIR /app
-COPY --from=builder /src/target/*jar app.jar
+COPY --from=builder /backend/target/*jar app.jar
 ENTRYPOINT ["java","-jar", "app.jar"]
